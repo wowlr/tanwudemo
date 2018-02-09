@@ -1,11 +1,10 @@
 package com.tanwuapp.tanwudemo.controller;
 
 import com.tanwuapp.tanwudemo.domain.User;
+import com.tanwuapp.tanwudemo.exception.CommonException;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,26 +23,30 @@ public class UserController {
 
     static Map<Long, User> users = Collections.synchronizedMap(new HashMap<>());
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    @RequestMapping(value="/exception", method=RequestMethod.GET)
+    public String exception() throws CommonException {
+        throw new CommonException( "测试异常" );
+    }
 
     @ApiOperation(value="获取用户列表", notes="")
     @RequestMapping(value="/", method=RequestMethod.GET)
-    public List<User> getUserList() {
+    public List<User> getUserList(){
         // 处理"/users/"的GET请求，用来获取用户列表
         // 还可以通过@RequestParam从页面中传递参数来进行查询条件或者翻页信息的传递
         List<User> r = new ArrayList<>(users.values());
-        logger.info("Sample Debug Message1111");
-        logger.warn("Sample Trace Message2222");
+//        logger.info("Sample Debug Message1111");
+//        logger.warn("Sample Trace Message2222");
         return r;
     }
 
     @ApiOperation(value="创建用户", notes="根据User对象创建用户")
     @RequestMapping(value="/", method=RequestMethod.POST)
-    public String postUser(@ModelAttribute User user) {
+    public String postUser(@ModelAttribute User user) throws CommonException{
         // 处理"/users/"的POST请求，用来创建User
         // 除了@ModelAttribute绑定参数之外，还可以通过@RequestParam从页面中传递参数
         users.put(user.getId(), user);
-        return "success";
+        throw new CommonException("用户异常");
+       // return "success";
     }
 
     @ApiOperation(value="获取用户详细信息", notes="根据url的id来获取用户详细信息")
